@@ -1,0 +1,713 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Pengurusan Kelas Emee</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{
+  --bg:#f6f4ee; --surface:#ffffff; --ink:#1d2421; --muted:#68726d; --line:#e2dfd5;
+  --accent:#2f6b57; --accent-ink:#ffffff; --soft:#eaf1ed;
+  --hadir:#2f6b57; --lewat:#9a6412; --tidak:#b4433a; --cuti:#4f5f9c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131816; --surface:#1c2320; --ink:#e8ece9; --muted:#97a19c; --line:#2d3733;
+    --accent:#6fb89c; --accent-ink:#0f1512; --soft:#22302a;
+    --hadir:#6fb89c; --lewat:#e0a85a; --tidak:#e07a70; --cuti:#9aa8e0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131816; --surface:#1c2320; --ink:#e8ece9; --muted:#97a19c; --line:#2d3733;
+  --accent:#6fb89c; --accent-ink:#0f1512; --soft:#22302a;
+  --hadir:#6fb89c; --lewat:#e0a85a; --tidak:#e07a70; --cuti:#9aa8e0;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg); color:var(--ink);
+  padding-top:16px; padding-bottom:40px;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1{font-size:20px; margin:0; letter-spacing:-.01em}
+h2{font-size:16px; margin:0 0 12px}
+header{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px}
+.hdr-kanan{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.sub{color:var(--muted); font-size:13px}
+nav{display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:16px}
+nav button{
+  flex:0 0 auto; border:1px solid var(--line); background:var(--surface); color:var(--ink);
+  padding:8px 14px; border-radius:999px; font:inherit; cursor:pointer;
+}
+nav button[aria-selected="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; min-width:0}
+.grid{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.stat{font-size:24px; font-weight:650; font-variant-numeric:tabular-nums}
+.label{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em}
+.stack{display:flex; flex-direction:column; gap:12px}
+.row{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding:12px 0; border-top:1px solid var(--line)}
+.row:first-child{border-top:0; padding-top:0}
+.grow{flex:1 1 180px; min-width:0}
+.muted{color:var(--muted)}
+.tabnum{font-variant-numeric:tabular-nums}
+form{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+label{display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); min-width:0}
+input, select, textarea{
+  font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line);
+  border-radius:8px; padding:9px 10px; min-width:0; width:100%;
+}
+textarea{min-height:90px; resize:vertical; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px}
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+button.btn{
+  font:inherit; border:1px solid var(--line); background:var(--surface); color:var(--ink);
+  border-radius:8px; padding:8px 12px; cursor:pointer; white-space:nowrap;
+}
+button.primary{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+button.danger{color:var(--tidak)}
+button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:var(--tidak)}
+.seg{display:inline-flex; gap:4px; flex-wrap:wrap}
+.seg button{
+  font:inherit; font-size:13px; min-width:44px; padding:6px 8px; cursor:pointer;
+  border:1px solid var(--line); background:var(--bg); color:var(--muted); border-radius:8px;
+}
+.seg button[aria-pressed="true"][data-s="hadir"]{background:var(--hadir); color:var(--bg); border-color:var(--hadir)}
+.seg button[aria-pressed="true"][data-s="lewat"]{background:var(--lewat); color:var(--bg); border-color:var(--lewat)}
+.seg button[aria-pressed="true"][data-s="tidak"]{background:var(--tidak); color:var(--bg); border-color:var(--tidak)}
+.seg button[aria-pressed="true"][data-s="cuti"]{background:var(--cuti); color:var(--bg); border-color:var(--cuti)}
+.pill{display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; background:var(--soft); color:var(--ink)}
+.pill.due{background:transparent; border:1px solid var(--tidak); color:var(--tidak)}
+.link{color:var(--accent)}
+.empty{text-align:center; padding:28px 12px; color:var(--muted)}
+.note{white-space:pre-wrap; overflow-wrap:anywhere; margin:4px 0 0}
+.toast{
+  position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  background:var(--ink); color:var(--bg); padding:10px 14px; border-radius:10px; font-size:13px;
+  opacity:0; transition:opacity .2s; pointer-events:none; max-width:90%;
+}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){ .toast{transition:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 id="tajukApp">Pengurus Tuisyen</h1>
+    <div class="sub">Pelajar, kehadiran, yuran, catatan dan penjaga</div>
+  </div>
+  <div class="hdr-kanan">
+    <div class="sub" id="tarikhHari"></div>
+    <button class="btn" type="button" id="btnTema" aria-label="Tukar mod cerah atau gelap">Mod gelap</button>
+  </div>
+</header>
+
+<nav role="tablist" aria-label="Bahagian">
+  <button role="tab" aria-selected="true" data-tab="dash">Ringkasan</button>
+  <button role="tab" aria-selected="false" data-tab="pelajar">Pelajar</button>
+  <button role="tab" aria-selected="false" data-tab="hadir">Kehadiran</button>
+  <button role="tab" aria-selected="false" data-tab="yuran">Yuran</button>
+  <button role="tab" aria-selected="false" data-tab="catatan">Catatan</button>
+  <button role="tab" aria-selected="false" data-tab="eksport">Eksport</button>
+</nav>
+
+<!-- RINGKASAN -->
+<section id="dash" class="stack">
+  <div class="grid">
+    <div class="card"><div class="label">Jumlah pelajar</div><div class="stat" id="stJumlah">0</div></div>
+    <div class="card"><div class="label">Kehadiran bulan ini</div><div class="stat" id="stHadir">–</div><div class="sub" id="stHadirSub"></div></div>
+    <div class="card"><div class="label">Yuran dikutip bulan ini</div><div class="stat" id="stYuran">RM0</div><div class="sub" id="stYuranSub"></div></div>
+  </div>
+  <div class="card">
+    <h2>Kelas hari ini</h2>
+    <div id="senaraiKelas"></div>
+  </div>
+  <div class="card">
+    <h2>Belum bayar yuran bulan ini</h2>
+    <div id="senaraiTunggak"></div>
+  </div>
+</section>
+
+<!-- PELAJAR -->
+<section id="pelajar" class="stack" hidden>
+  <div class="card">
+    <h2 id="borangTajuk">Tambah pelajar</h2>
+    <form id="borang" autocomplete="off">
+      <label>Nama pelajar<input id="fNama" required maxlength="80"></label>
+      <label>Subjek<input id="fSubjek" maxlength="60" placeholder="cth. Matematik Tingkatan 3"></label>
+      <label>Yuran bulanan (RM)<input id="fYuran" type="number" min="0" step="1" inputmode="decimal" required></label>
+      <label>Hari kelas
+        <select id="fHari">
+          <option value="">Tiada jadual</option>
+          <option value="1">Isnin</option><option value="2">Selasa</option><option value="3">Rabu</option>
+          <option value="4">Khamis</option><option value="5">Jumaat</option><option value="6">Sabtu</option><option value="0">Ahad</option>
+        </select>
+      </label>
+      <label>Masa kelas<input id="fMasa" type="time"></label>
+      <label>Nama penjaga<input id="fPenjaga" maxlength="80"></label>
+      <label>No. telefon penjaga<input id="fTel" type="tel" inputmode="tel" maxlength="20" placeholder="012-3456789"></label>
+      <div class="actions">
+        <button class="btn primary" type="submit" id="btnSimpan">Simpan</button>
+        <button class="btn" type="button" id="btnBatal" hidden>Batal</button>
+      </div>
+    </form>
+  </div>
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Senarai pelajar</h2>
+      <input id="cari" type="search" placeholder="Cari nama atau penjaga" class="grow" style="max-width:260px" aria-label="Cari pelajar"></div>
+    <div id="senaraiPelajar" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <div class="row" style="border-top:0; padding-top:0">
+      <div class="grow sub">Padam semua pelajar beserta kehadiran, yuran dan catatan mereka.</div>
+      <button class="btn danger" type="button" id="btnPadamSemua">Padam semua</button>
+    </div>
+    <div id="amaranPadam" class="stack" hidden style="margin-top:12px; padding:12px; border:1px solid var(--tidak); border-radius:10px">
+      <strong style="color:var(--tidak)">Amaran: tindakan ini tidak boleh dibatalkan.</strong>
+      <div>Semua <span id="amaranBil">0</span> pelajar beserta kehadiran, yuran dan catatan akan dipadam dari pelayar ini.</div>
+      <div class="actions">
+        <button class="btn danger" type="button" id="btnYaPadam">Ya, padam semua</button>
+        <button class="btn" type="button" id="btnTidakPadam">Batal</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KEHADIRAN -->
+<section id="hadir" class="stack" hidden>
+  <div class="card">
+    <div class="row">
+      <label style="min-width:180px">Tarikh<input id="tarikhHadir" type="date"></label>
+      <div class="sub tabnum" id="ringkasHadir"></div>
+    </div>
+  </div>
+  <div class="card" id="senaraiHadir"></div>
+</section>
+
+<!-- YURAN -->
+<section id="yuran" class="stack" hidden>
+  <div class="card">
+    <div class="row">
+      <label style="min-width:180px">Bulan<input id="bulanYuran" type="month"></label>
+      <div class="sub tabnum" id="ringkasYuran"></div>
+    </div>
+  </div>
+  <div class="card" id="senaraiYuran"></div>
+</section>
+
+<!-- CATATAN -->
+<section id="catatan" class="stack" hidden>
+  <div class="card">
+    <h2>Tambah catatan kemajuan</h2>
+    <form id="borangCatatan" autocomplete="off">
+      <label>Pelajar<select id="cPelajar" required></select></label>
+      <label>Tarikh<input id="cTarikh" type="date" required></label>
+      <label style="grid-column:1/-1">Catatan<textarea id="cTeks" maxlength="1000" placeholder="cth. Faham topik pecahan, perlu latihan tambahan untuk perkataan."></textarea></label>
+      <div class="actions"><button class="btn primary" type="submit">Simpan catatan</button></div>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Catatan terdahulu</h2>
+    <div id="senaraiCatatan"></div>
+  </div>
+</section>
+
+<!-- EKSPORT -->
+<section id="eksport" class="stack" hidden>
+  <div class="card">
+    <div class="row">
+      <label style="min-width:180px">Bulan<input id="bulanEks" type="month"></label>
+      <div class="sub">Salin teks di bawah dan tampal ke Excel atau Google Sheets. Format CSV dengan koma.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Kehadiran bulan ini</h2>
+      <button class="btn" type="button" data-copy="csvHadir">Salin</button></div>
+    <textarea id="csvHadir" readonly aria-label="CSV kehadiran" style="margin-top:8px"></textarea>
+  </div>
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Yuran bulan ini</h2>
+      <button class="btn" type="button" data-copy="csvYuran">Salin</button></div>
+    <textarea id="csvYuran" readonly aria-label="CSV yuran" style="margin-top:8px"></textarea>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  const KEY = "tuisyen.v1";
+  const HARI = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
+  const STATUS = [["hadir","Hadir"],["lewat","Lewat"],["tidak","Tidak hadir"],["cuti","Cuti"]];
+  const STATUS_LABEL = {hadir:"Hadir", lewat:"Lewat", tidak:"Tidak hadir", cuti:"Cuti"};
+  const TPL_KELAS = "Assalamualaikum {penjaga}, ingatan kelas {nama} ({subjek}) hari ini pukul {masa}. Terima kasih.";
+  const TPL_YURAN = "Assalamualaikum {penjaga}, makluman yuran tuisyen {nama} untuk bulan ini sebanyak RM{yuran}. Terima kasih.";
+
+  function defaults(){
+    return {
+      students: [], att: {}, fees: {}, notes: {},
+      settings: { theme:"system", fs:"biasa", tuisyenName:"", defaultFee:"", tplKelas:TPL_KELAS, tplYuran:TPL_YURAN }
+    };
+  }
+  function normalize(o){
+    const d = defaults();
+    if (!o || typeof o !== "object") return d;
+    d.students = Array.isArray(o.students) ? o.students : [];
+    d.att = (o.att && typeof o.att === "object") ? o.att : {};
+    d.fees = (o.fees && typeof o.fees === "object") ? o.fees : {};
+    d.notes = (o.notes && typeof o.notes === "object") ? o.notes : {};
+    d.settings = Object.assign(d.settings, (o.settings && typeof o.settings === "object") ? o.settings : {});
+    return d;
+  }
+
+  let db;
+  try { db = normalize(JSON.parse(localStorage.getItem(KEY) || "null")); } catch(e){ db = defaults(); }
+
+  let editId = null;
+  let armedBtn = null, armedTimer = null;
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const ymd = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  const todayStr = ymd(new Date());
+  const monthOf = (s) => s.slice(0,7);
+  const rm = (n) => "RM" + Number(n || 0).toLocaleString("ms-MY", {minimumFractionDigits:0, maximumFractionDigits:2});
+  const byName = (a,b) => a.nama.localeCompare(b.nama, "ms");
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+  function persist(){
+    try { localStorage.setItem(KEY, JSON.stringify(db)); }
+    catch(e){ toast("Data tidak dapat disimpan dalam pelayar ini."); }
+  }
+  let toastTimer = null;
+  function toast(msg){
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("show"), 2200);
+  }
+  function waLink(tel, text){
+    let d = String(tel || "").replace(/\D/g,"");
+    if (!d) return "";
+    if (d.startsWith("0")) d = "60" + d.slice(1);
+    return "https://wa.me/" + d + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+  function telLabel(tel){ return tel ? esc(tel) : '<span class="muted">Tiada nombor</span>'; }
+  function jadual(s){
+    if (s.hari === "" || s.hari == null) return "Tiada jadual";
+    return HARI[Number(s.hari)] + (s.masa ? ", " + s.masa : "");
+  }
+  function csvCell(v){
+    const c = String(v == null ? "" : v);
+    return /[",\n]/.test(c) ? '"' + c.replace(/"/g,'""') + '"' : c;
+  }
+  function toCsv(rows){ return rows.map(r => r.map(csvCell).join(",")).join("\n"); }
+  function fill(tpl, s){
+    const vars = {
+      nama: s.nama || "", penjaga: s.penjaga || "", subjek: s.subjek || "",
+      masa: s.masa || "-", yuran: String(s.yuran == null ? "" : s.yuran),
+      tuisyen: db.settings.tuisyenName || ""
+    };
+    return String(tpl || "").replace(/\{(\w+)\}/g, (m,k) => (k in vars) ? vars[k] : m);
+  }
+
+  /* Pengesahan dua klik (kerana dialog tidak dibenarkan dalam paparan ini). */
+  function twoStep(btn, onConfirm){
+    if (btn.dataset.armed !== "1") {
+      resetArmed();
+      btn.dataset.armed = "1"; btn.textContent = "Sahkan padam";
+      armedBtn = btn; armedTimer = setTimeout(resetArmed, 3000);
+      return;
+    }
+    resetArmed(); onConfirm();
+  }
+  function resetArmed(){
+    clearTimeout(armedTimer);
+    if (armedBtn) { armedBtn.dataset.armed = "0"; armedBtn.textContent = "Padam"; armedBtn = null; }
+  }
+
+  /* ---------- Tema (cerah / gelap) ---------- */
+  function effectiveTheme(){
+    const t = db.settings.theme;
+    if (t === "light" || t === "dark") return t;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function applySettings(){
+    const s = db.settings;
+    const root = document.documentElement;
+    const tema = effectiveTheme();
+    root.dataset.theme = tema;
+    root.dataset.fs = s.fs === "besar" ? "besar" : "biasa";
+    const name = (s.tuisyenName || "").trim() || "Pengurus Tuisyen";
+    $("tajukApp").textContent = name;
+    document.title = name;
+    $("btnTema").textContent = tema === "dark" ? "Mod cerah" : "Mod gelap";
+  }
+  $("btnTema").addEventListener("click", () => {
+    db.settings.theme = effectiveTheme() === "dark" ? "light" : "dark";
+    persist(); applySettings();
+  });
+
+  /* ---------- Tab ---------- */
+  document.querySelectorAll("nav [data-tab]").forEach(btn => {
+    btn.addEventListener("click", () => showTab(btn.dataset.tab));
+  });
+  function showTab(name){
+    document.querySelectorAll("nav [data-tab]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
+    ["dash","pelajar","hadir","yuran","catatan","eksport"].forEach(id => $(id).hidden = (id !== name));
+    renderAll();
+  }
+
+  /* ---------- Pelajar ---------- */
+  function resetForm(){
+    editId = null;
+    $("borang").reset();
+    $("fYuran").value = db.settings.defaultFee || "";
+    $("borangTajuk").textContent = "Tambah pelajar";
+    $("btnSimpan").textContent = "Simpan";
+    $("btnBatal").hidden = true;
+  }
+  $("btnBatal").addEventListener("click", resetForm);
+  $("borang").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nama = $("fNama").value.trim();
+    const yuran = parseFloat($("fYuran").value);
+    if (!nama) { toast("Sila isi nama pelajar."); return; }
+    if (isNaN(yuran) || yuran < 0) { toast("Sila isi yuran yang sah."); return; }
+    const data = {
+      nama, subjek: $("fSubjek").value.trim(), yuran,
+      hari: $("fHari").value, masa: $("fMasa").value,
+      penjaga: $("fPenjaga").value.trim(), tel: $("fTel").value.trim()
+    };
+    if (editId) {
+      const s = db.students.find(x => x.id === editId);
+      if (s) Object.assign(s, data);
+      toast("Maklumat dikemas kini.");
+    } else {
+      db.students.push(Object.assign({ id: newId() }, data));
+      toast("Pelajar ditambah.");
+    }
+    persist(); resetForm(); renderAll();
+  });
+  $("cari").addEventListener("input", renderStudents);
+
+  function renderStudents(){
+    const q = $("cari").value.trim().toLowerCase();
+    const list = db.students
+      .filter(s => !q || (s.nama + " " + s.penjaga + " " + s.subjek).toLowerCase().includes(q))
+      .sort(byName);
+    const box = $("senaraiPelajar");
+    if (!db.students.length) {
+      box.innerHTML = '<div class="empty">Belum ada pelajar. Isi borang di atas untuk mula, atau <button class="btn" id="btnContoh" type="button">isi contoh data</button>.</div>';
+      const b = $("btnContoh"); if (b) b.addEventListener("click", seedExamples);
+      return;
+    }
+    if (!list.length) { box.innerHTML = '<div class="empty">Tiada pelajar sepadan dengan carian.</div>'; return; }
+    box.innerHTML = list.map(s => `
+      <div class="row">
+        <div class="grow">
+          <div><strong>${esc(s.nama)}</strong> <span class="muted">· ${esc(s.subjek) || "Tiada subjek"}</span></div>
+          <div class="sub tabnum">${rm(s.yuran)} / bulan · ${esc(jadual(s))}</div>
+        </div>
+        <div class="grow">
+          <div>${esc(s.penjaga) || '<span class="muted">Tiada nama penjaga</span>'}</div>
+          <div class="sub">${telLabel(s.tel)}
+            ${s.tel ? ` · <a class="link" href="${waLink(s.tel)}" target="_blank" rel="noopener">WhatsApp</a>` : ""}</div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" data-edit="${s.id}">Kemas kini</button>
+          <button class="btn danger" type="button" data-del="${s.id}">Padam</button>
+        </div>
+      </div>`).join("");
+  }
+
+  $("senaraiPelajar").addEventListener("click", (e) => {
+    const ed = e.target.closest("[data-edit]");
+    const dl = e.target.closest("[data-del]");
+    if (ed) {
+      const s = db.students.find(x => x.id === ed.dataset.edit); if (!s) return;
+      editId = s.id;
+      $("fNama").value = s.nama; $("fSubjek").value = s.subjek; $("fYuran").value = s.yuran;
+      $("fHari").value = s.hari == null ? "" : String(s.hari); $("fMasa").value = s.masa || "";
+      $("fPenjaga").value = s.penjaga; $("fTel").value = s.tel;
+      $("borangTajuk").textContent = "Kemas kini pelajar";
+      $("btnSimpan").textContent = "Kemas kini";
+      $("btnBatal").hidden = false;
+      $("fNama").focus();
+      return;
+    }
+    if (dl) {
+      twoStep(dl, () => {
+        const id = dl.dataset.del;
+        db.students = db.students.filter(s => s.id !== id);
+        Object.keys(db.att).forEach(d => { delete db.att[d][id]; });
+        Object.keys(db.fees).forEach(m => { delete db.fees[m][id]; });
+        delete db.notes[id];
+        persist(); renderAll(); toast("Pelajar dipadam.");
+      });
+    }
+  });
+
+  /* Padam semua pelajar, dengan amaran sebelum tindakan. */
+  $("btnPadamSemua").addEventListener("click", () => {
+    if (!db.students.length) { toast("Tiada pelajar untuk dipadam."); return; }
+    $("amaranBil").textContent = db.students.length;
+    $("amaranPadam").hidden = false;
+    $("btnPadamSemua").hidden = true;
+  });
+  $("btnTidakPadam").addEventListener("click", () => {
+    $("amaranPadam").hidden = true;
+    $("btnPadamSemua").hidden = false;
+  });
+  $("btnYaPadam").addEventListener("click", () => {
+    db.students = []; db.att = {}; db.fees = {}; db.notes = {};
+    persist(); resetForm(); renderAll();
+    $("amaranPadam").hidden = true;
+    $("btnPadamSemua").hidden = false;
+    toast("Semua pelajar dan rekod dipadam.");
+  });
+
+  function seedExamples(){
+    const contoh = [
+      {nama:"Contoh Ali", subjek:"Matematik Tingkatan 3", yuran:120, hari:"1", masa:"16:00", penjaga:"Contoh Encik Ahmad", tel:"012-3456789"},
+      {nama:"Contoh Siti", subjek:"Sains Tingkatan 1", yuran:100, hari:"3", masa:"17:30", penjaga:"Contoh Puan Aminah", tel:"013-9876543"},
+      {nama:"Contoh Farid", subjek:"Bahasa Inggeris Darjah 6", yuran:80, hari:String(new Date().getDay()), masa:"09:00", penjaga:"Contoh Encik Razak", tel:""}
+    ].map((x,i) => Object.assign({id:"contoh"+i}, x));
+    db.students = db.students.concat(contoh);
+    persist(); renderAll(); toast("Contoh data ditambah. Padam bila tidak diperlukan.");
+  }
+
+  /* ---------- Kehadiran ---------- */
+  $("tarikhHadir").value = todayStr;
+  $("tarikhHadir").addEventListener("change", renderAttendance);
+  $("senaraiHadir").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-s]"); if (!b) return;
+    const d = $("tarikhHadir").value; if (!d) return;
+    const sid = b.dataset.id;
+    db.att[d] = db.att[d] || {};
+    if (db.att[d][sid] === b.dataset.s) delete db.att[d][sid];
+    else db.att[d][sid] = b.dataset.s;
+    persist(); renderAttendance(); renderDash();
+  });
+
+  function renderAttendance(){
+    const d = $("tarikhHadir").value || todayStr;
+    const rec = db.att[d] || {};
+    const list = db.students.slice().sort(byName);
+    const counts = {hadir:0,lewat:0,tidak:0,cuti:0};
+    list.forEach(s => { if (rec[s.id]) counts[rec[s.id]]++; });
+    const direkod = Object.values(counts).reduce((a,b)=>a+b,0);
+    $("ringkasHadir").textContent = `Hadir ${counts.hadir} · Lewat ${counts.lewat} · Tidak ${counts.tidak} · Cuti ${counts.cuti} · Belum ${list.length - direkod}`;
+    if (!list.length) { $("senaraiHadir").innerHTML = '<div class="empty">Tambah pelajar dahulu di tab Pelajar.</div>'; return; }
+    $("senaraiHadir").innerHTML = list.map(s => `
+      <div class="row">
+        <div class="grow"><strong>${esc(s.nama)}</strong> <span class="muted">· ${esc(s.subjek)}</span></div>
+        <div class="seg" role="group" aria-label="Kehadiran ${esc(s.nama)}">
+          ${STATUS.map(([k,label]) => `<button type="button" data-id="${s.id}" data-s="${k}" aria-pressed="${rec[s.id]===k}">${label}</button>`).join("")}
+        </div>
+      </div>`).join("");
+  }
+
+  /* ---------- Yuran ---------- */
+  $("bulanYuran").value = monthOf(todayStr);
+  $("bulanYuran").addEventListener("change", renderFees);
+  $("senaraiYuran").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-paid]"); if (!b) return;
+    const m = $("bulanYuran").value; if (!m) return;
+    db.fees[m] = db.fees[m] || {};
+    const id = b.dataset.paid;
+    if (db.fees[m][id] && db.fees[m][id].paid) delete db.fees[m][id];
+    else db.fees[m][id] = { paid: true, on: todayStr };
+    persist(); renderFees(); renderDash();
+  });
+
+  function renderFees(){
+    const m = $("bulanYuran").value || monthOf(todayStr);
+    const rec = db.fees[m] || {};
+    const list = db.students.slice().sort(byName);
+    let expected = 0, collected = 0, paidCount = 0;
+    list.forEach(s => { expected += s.yuran; if (rec[s.id] && rec[s.id].paid) { collected += s.yuran; paidCount++; } });
+    $("ringkasYuran").textContent = `Dikutip ${rm(collected)} daripada ${rm(expected)} · ${paidCount}/${list.length} sudah bayar`;
+    if (!list.length) { $("senaraiYuran").innerHTML = '<div class="empty">Tambah pelajar dahulu di tab Pelajar.</div>'; return; }
+    $("senaraiYuran").innerHTML = list.map(s => {
+      const p = !!(rec[s.id] && rec[s.id].paid);
+      const msg = fill(db.settings.tplYuran, s);
+      return `
+      <div class="row">
+        <div class="grow">
+          <strong>${esc(s.nama)}</strong> <span class="muted tabnum">· ${rm(s.yuran)}</span>
+          <div class="sub">${p ? "Dibayar pada " + esc(rec[s.id].on) : "Belum dibayar"}
+            ${!p && s.tel ? ` · <a class="link" href="${waLink(s.tel, msg)}" target="_blank" rel="noopener">Ingatkan penjaga</a>` : ""}</div>
+        </div>
+        <button type="button" class="btn ${p ? "primary" : ""}" data-paid="${s.id}" aria-pressed="${p}">
+          ${p ? "Dibayar ✓" : "Tanda sudah bayar"}
+        </button>
+      </div>`;
+    }).join("");
+  }
+
+  /* ---------- Catatan ---------- */
+  $("cTarikh").value = todayStr;
+  function renderNoteOptions(){
+    const cur = $("cPelajar").value;
+    const list = db.students.slice().sort(byName);
+    $("cPelajar").innerHTML = list.length
+      ? list.map(s => `<option value="${s.id}">${esc(s.nama)}</option>`).join("")
+      : '<option value="">Tiada pelajar</option>';
+    if (cur && list.some(s => s.id === cur)) $("cPelajar").value = cur;
+  }
+  $("borangCatatan").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const sid = $("cPelajar").value;
+    const teks = $("cTeks").value.trim();
+    const tarikh = $("cTarikh").value;
+    if (!sid) { toast("Tambah pelajar dahulu."); return; }
+    if (!teks) { toast("Sila tulis catatan."); return; }
+    db.notes[sid] = db.notes[sid] || [];
+    db.notes[sid].push({ id: newId(), tarikh: tarikh || todayStr, teks });
+    persist(); $("cTeks").value = ""; renderNotes(); toast("Catatan disimpan.");
+  });
+  function renderNotes(){
+    const box = $("senaraiCatatan");
+    const sid = $("cPelajar").value;
+    const list = (db.notes[sid] || []).slice().sort((a,b) => b.tarikh.localeCompare(a.tarikh));
+    if (!db.students.length) { box.innerHTML = '<div class="empty">Tambah pelajar dahulu.</div>'; return; }
+    if (!list.length) { box.innerHTML = '<div class="empty">Belum ada catatan untuk pelajar ini.</div>'; return; }
+    box.innerHTML = list.map(n => `
+      <div class="row">
+        <div class="grow">
+          <div class="sub tabnum">${esc(n.tarikh)}</div>
+          <p class="note">${esc(n.teks)}</p>
+        </div>
+        <button class="btn danger" type="button" data-note="${n.id}">Padam</button>
+      </div>`).join("");
+  }
+  $("cPelajar").addEventListener("change", renderNotes);
+  $("senaraiCatatan").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-note]"); if (!b) return;
+    twoStep(b, () => {
+      const sid = $("cPelajar").value;
+      db.notes[sid] = (db.notes[sid] || []).filter(n => n.id !== b.dataset.note);
+      persist(); renderNotes(); toast("Catatan dipadam.");
+    });
+  });
+
+  /* ---------- Eksport ---------- */
+  $("bulanEks").value = monthOf(todayStr);
+  $("bulanEks").addEventListener("change", renderExport);
+  function renderExport(){
+    const m = $("bulanEks").value || monthOf(todayStr);
+    const list = db.students.slice().sort(byName);
+    const att = [["Nama","Tarikh","Status"]];
+    Object.keys(db.att).sort().forEach(d => {
+      if (monthOf(d) !== m) return;
+      list.forEach(s => { const v = db.att[d][s.id]; if (v) att.push([s.nama, d, STATUS_LABEL[v]]); });
+    });
+    const fee = [["Nama","Bulan","Yuran (RM)","Dibayar","Tarikh bayar"]];
+    const rec = db.fees[m] || {};
+    list.forEach(s => {
+      const p = rec[s.id] && rec[s.id].paid;
+      fee.push([s.nama, m, s.yuran, p ? "Ya" : "Tidak", p ? rec[s.id].on : ""]);
+    });
+    $("csvHadir").value = toCsv(att);
+    $("csvYuran").value = toCsv(fee);
+  }
+  document.querySelectorAll("[data-copy]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const ta = $(btn.dataset.copy);
+      if (!ta.value) { toast("Tiada kandungan untuk disalin."); return; }
+      const done = () => toast("Disalin. Tampal di Excel atau Sheets.");
+      const fallback = () => { ta.focus(); ta.select(); toast("Tekan Ctrl+C atau salin teks yang dipilih."); };
+      try {
+        navigator.clipboard.writeText(ta.value).then(done, fallback);
+      } catch(err){ fallback(); }
+    });
+  });
+
+  /* ---------- Ringkasan ---------- */
+  function renderDash(){
+    const now = new Date();
+    $("tarikhHari").textContent = now.toLocaleDateString("ms-MY", {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+    $("stJumlah").textContent = db.students.length;
+
+    const mBulan = monthOf(todayStr);
+    let total = 0, present = 0;
+    Object.keys(db.att).forEach(d => {
+      if (monthOf(d) !== mBulan) return;
+      Object.values(db.att[d] || {}).forEach(v => {
+        if (v === "cuti") return;
+        total++;
+        if (v === "hadir" || v === "lewat") present++;
+      });
+    });
+    if (total) {
+      $("stHadir").textContent = Math.round(present / total * 100) + "%";
+      $("stHadirSub").textContent = `${present} daripada ${total} rekod`;
+    } else {
+      $("stHadir").textContent = "–";
+      $("stHadirSub").textContent = "Belum ada rekod bulan ini";
+    }
+
+    const rec = db.fees[mBulan] || {};
+    let expected = 0, collected = 0;
+    db.students.forEach(s => { expected += s.yuran; if (rec[s.id] && rec[s.id].paid) collected += s.yuran; });
+    $("stYuran").textContent = rm(collected);
+    $("stYuranSub").textContent = `daripada ${rm(expected)} dijangka`;
+
+    const hariIni = now.getDay();
+    const kelas = db.students
+      .filter(s => s.hari !== "" && s.hari != null && Number(s.hari) === hariIni)
+      .sort((a,b) => (a.masa || "99:99").localeCompare(b.masa || "99:99"));
+    if (!db.students.length) { $("senaraiKelas").innerHTML = '<div class="empty">Tiada data lagi.</div>'; }
+    else if (!kelas.length) { $("senaraiKelas").innerHTML = '<div class="empty">Tiada kelas dijadualkan hari ini.</div>'; }
+    else {
+      $("senaraiKelas").innerHTML = kelas.map(s => {
+        const msg = fill(db.settings.tplKelas, s);
+        return `
+        <div class="row">
+          <div class="grow">
+            <strong class="tabnum">${esc(s.masa) || "Masa belum ditetapkan"}</strong> · ${esc(s.nama)}
+            <span class="muted">· ${esc(s.subjek)}</span>
+          </div>
+          ${s.tel ? `<a class="btn" href="${waLink(s.tel, msg)}" target="_blank" rel="noopener">Ingatkan penjaga</a>` : '<span class="muted">Tiada nombor penjaga</span>'}
+        </div>`;
+      }).join("");
+    }
+
+    const tunggak = db.students.filter(s => !(rec[s.id] && rec[s.id].paid)).sort(byName);
+    if (!db.students.length) { $("senaraiTunggak").innerHTML = '<div class="empty">Tiada data lagi.</div>'; }
+    else if (!tunggak.length) { $("senaraiTunggak").innerHTML = '<div class="empty">Semua pelajar sudah bayar bulan ini.</div>'; }
+    else {
+      $("senaraiTunggak").innerHTML = tunggak.map(s => `
+        <div class="row">
+          <div class="grow"><strong>${esc(s.nama)}</strong> <span class="muted">· ${esc(s.penjaga) || "Tiada nama penjaga"}</span></div>
+          <div class="actions">
+            <span class="pill due tabnum">${rm(s.yuran)}</span>
+            ${s.tel ? `<a class="link" href="${waLink(s.tel, fill(db.settings.tplYuran, s))}" target="_blank" rel="noopener">WhatsApp</a>` : ""}
+          </div>
+        </div>`).join("");
+    }
+  }
+
+  function renderAll(){
+    applySettings();
+    renderDash();
+    renderStudents();
+    renderAttendance();
+    renderFees();
+    renderNoteOptions();
+    renderNotes();
+    renderExport();
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
+
+</body></html>
