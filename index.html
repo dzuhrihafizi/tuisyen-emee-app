@@ -86,6 +86,9 @@ button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:
 .link{color:var(--accent)}
 .empty{text-align:center; padding:28px 12px; color:var(--muted)}
 .note{white-space:pre-wrap; overflow-wrap:anywhere; margin:4px 0 0}
+.hari{display:flex; gap:6px; flex-wrap:wrap}
+.hari label{flex-direction:row; align-items:center; gap:6px; color:var(--ink); border:1px solid var(--line); padding:6px 10px; border-radius:8px; background:var(--bg); cursor:pointer}
+.hari input{width:auto; margin:0}
 .toast{
   position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom,0px));
   background:var(--ink); color:var(--bg); padding:10px 14px; border-radius:10px; font-size:13px;
@@ -142,13 +145,18 @@ button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:
       <label>Nama pelajar<input id="fNama" required maxlength="80"></label>
       <label>Subjek<input id="fSubjek" maxlength="60" placeholder="cth. Matematik Tingkatan 3"></label>
       <label>Yuran bulanan (RM)<input id="fYuran" type="number" min="0" step="1" inputmode="decimal" required></label>
-      <label>Hari kelas
-        <select id="fHari">
-          <option value="">Tiada jadual</option>
-          <option value="1">Isnin</option><option value="2">Selasa</option><option value="3">Rabu</option>
-          <option value="4">Khamis</option><option value="5">Jumaat</option><option value="6">Sabtu</option><option value="0">Ahad</option>
-        </select>
-      </label>
+      <fieldset style="grid-column:1/-1; border:0; padding:0; margin:0; min-width:0">
+        <legend class="label" style="margin-bottom:6px">Hari kelas (pilih satu atau lebih)</legend>
+        <div class="hari" id="fHari">
+          <label><input type="checkbox" name="fHari" value="1">Isnin</label>
+          <label><input type="checkbox" name="fHari" value="2">Selasa</label>
+          <label><input type="checkbox" name="fHari" value="3">Rabu</label>
+          <label><input type="checkbox" name="fHari" value="4">Khamis</label>
+          <label><input type="checkbox" name="fHari" value="5">Jumaat</label>
+          <label><input type="checkbox" name="fHari" value="6">Sabtu</label>
+          <label><input type="checkbox" name="fHari" value="0">Ahad</label>
+        </div>
+      </fieldset>
       <label>Masa kelas<input id="fMasa" type="time"></label>
       <label>Nama penjaga<input id="fPenjaga" maxlength="80"></label>
       <label>No. telefon penjaga<input id="fTel" type="tel" inputmode="tel" maxlength="20" placeholder="012-3456789"></label>
@@ -297,9 +305,24 @@ button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:
     return "https://wa.me/" + d + (text ? "?text=" + encodeURIComponent(text) : "");
   }
   function telLabel(tel){ return tel ? esc(tel) : '<span class="muted">Tiada nombor</span>'; }
+  /* Hari kelas disimpan sebagai senarai, contoh ["1","3"]. Rekod lama (satu nilai) disokong. */
+  function daysOf(s){
+    if (Array.isArray(s.hari)) return s.hari.map(String);
+    if (s.hari === "" || s.hari == null) return [];
+    return [String(s.hari)];
+  }
+  function getHari(){
+    return Array.from(document.querySelectorAll('input[name="fHari"]:checked')).map(c => c.value);
+  }
+  function setHari(arr){
+    const set = new Set(daysOf({hari: arr}));
+    document.querySelectorAll('input[name="fHari"]').forEach(c => { c.checked = set.has(c.value); });
+  }
   function jadual(s){
-    if (s.hari === "" || s.hari == null) return "Tiada jadual";
-    return HARI[Number(s.hari)] + (s.masa ? ", " + s.masa : "");
+    const hr = daysOf(s);
+    if (!hr.length) return "Tiada jadual";
+    const names = hr.map(h => HARI[Number(h)]).join(", ");
+    return names + (s.masa ? " · " + s.masa : "");
   }
   function csvCell(v){
     const c = String(v == null ? "" : v);
@@ -380,7 +403,7 @@ button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:
     if (isNaN(yuran) || yuran < 0) { toast("Sila isi yuran yang sah."); return; }
     const data = {
       nama, subjek: $("fSubjek").value.trim(), yuran,
-      hari: $("fHari").value, masa: $("fMasa").value,
+      hari: getHari(), masa: $("fMasa").value,
       penjaga: $("fPenjaga").value.trim(), tel: $("fTel").value.trim()
     };
     if (editId) {
@@ -432,7 +455,7 @@ button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:
       const s = db.students.find(x => x.id === ed.dataset.edit); if (!s) return;
       editId = s.id;
       $("fNama").value = s.nama; $("fSubjek").value = s.subjek; $("fYuran").value = s.yuran;
-      $("fHari").value = s.hari == null ? "" : String(s.hari); $("fMasa").value = s.masa || "";
+      setHari(daysOf(s)); $("fMasa").value = s.masa || "";
       $("fPenjaga").value = s.penjaga; $("fTel").value = s.tel;
       $("borangTajuk").textContent = "Kemas kini pelajar";
       $("btnSimpan").textContent = "Kemas kini";
@@ -473,9 +496,9 @@ button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:
 
   function seedExamples(){
     const contoh = [
-      {nama:"Contoh Ali", subjek:"Matematik Tingkatan 3", yuran:120, hari:"1", masa:"16:00", penjaga:"Contoh Encik Ahmad", tel:"012-3456789"},
-      {nama:"Contoh Siti", subjek:"Sains Tingkatan 1", yuran:100, hari:"3", masa:"17:30", penjaga:"Contoh Puan Aminah", tel:"013-9876543"},
-      {nama:"Contoh Farid", subjek:"Bahasa Inggeris Darjah 6", yuran:80, hari:String(new Date().getDay()), masa:"09:00", penjaga:"Contoh Encik Razak", tel:""}
+      {nama:"Contoh Ali", subjek:"Matematik Tingkatan 3", yuran:120, hari:["1","4"], masa:"16:00", penjaga:"Contoh Encik Ahmad", tel:"012-3456789"},
+      {nama:"Contoh Siti", subjek:"Sains Tingkatan 1", yuran:100, hari:["3"], masa:"17:30", penjaga:"Contoh Puan Aminah", tel:"013-9876543"},
+      {nama:"Contoh Farid", subjek:"Bahasa Inggeris Darjah 6", yuran:80, hari:[String(new Date().getDay())], masa:"09:00", penjaga:"Contoh Encik Razak", tel:""}
     ].map((x,i) => Object.assign({id:"contoh"+i}, x));
     db.students = db.students.concat(contoh);
     persist(); renderAll(); toast("Contoh data ditambah. Padam bila tidak diperlukan.");
@@ -660,7 +683,7 @@ button.danger[data-armed="1"]{background:var(--tidak); color:#fff; border-color:
 
     const hariIni = now.getDay();
     const kelas = db.students
-      .filter(s => s.hari !== "" && s.hari != null && Number(s.hari) === hariIni)
+      .filter(s => daysOf(s).includes(String(hariIni)))
       .sort((a,b) => (a.masa || "99:99").localeCompare(b.masa || "99:99"));
     if (!db.students.length) { $("senaraiKelas").innerHTML = '<div class="empty">Tiada data lagi.</div>'; }
     else if (!kelas.length) { $("senaraiKelas").innerHTML = '<div class="empty">Tiada kelas dijadualkan hari ini.</div>'; }
