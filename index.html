@@ -28,6 +28,9 @@
   color-scheme: dark;
 }
 *{box-sizing:border-box}
+/* Penting: tanpa baris ini, .stack (display:flex) akan mengatasi atribut hidden,
+   menyebabkan semua bahagian kelihatan serentak di telefon. */
+[hidden]{display:none!important}
 body{
   margin:0; font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   background:var(--bg); color:var(--ink);
